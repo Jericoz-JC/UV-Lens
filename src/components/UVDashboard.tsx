@@ -227,12 +227,7 @@ export default function UVDashboard() {
           <div className="bg-white rounded-3xl shadow-xl p-6 mb-6">
             <h3 className="text-lg font-semibold text-gray-700 mb-4">Recommendations</h3>
             <div className="space-y-3">
-              {protection.recommendations.map((rec, index) => (
-                <div key={index} className="flex items-start space-x-3">
-                  <div className="flex-shrink-0 w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                  <p className="text-sm text-gray-600 leading-relaxed">{rec}</p>
-                </div>
-              ))}
+                            {protection.recommendations.map((rec: string, index: number) => (                <div key={index} className="flex items-start space-x-3">                  <div className="flex-shrink-0 w-2 h-2 bg-blue-500 rounded-full mt-2"></div>                  <p className="text-sm text-gray-600 leading-relaxed">{rec}</p>                </div>              ))}
             </div>
           </div>
         )}
@@ -289,20 +284,7 @@ function ProfileSetup({ onSave }: { onSave: (profile: ProfileData) => void }) {
           <div className="mb-6">
             <h3 className="text-lg font-semibold text-gray-700 mb-3">Skin Type</h3>
             <div className="space-y-2">
-              {SKIN_TYPES.map((type, index) => (
-                <label key={index} className="flex items-center space-x-3 cursor-pointer">
-                  <input
-                    type="radio"
-                    value={index}
-                    checked={skinType === index}
-                    onChange={(e) => setSkinType(parseInt(e.target.value))}
-                    className="w-4 h-4 text-blue-600"
-                  />
-                  <span className="text-sm text-gray-600">
-                    Type {type.type}: {type.description}
-                  </span>
-                </label>
-              ))}
+                            {SKIN_TYPES.map((type, index: number) => (                <label key={index} className="flex items-center space-x-3 cursor-pointer">                  <input                    type="radio"                    value={index}                    checked={skinType === index}                    onChange={(e) => setSkinType(parseInt(e.target.value))}                    className="w-4 h-4 text-blue-600"                  />                  <span className="text-sm text-gray-600">                    Type {type.type}: {type.description}                  </span>                </label>              ))}
             </div>
           </div>
 
