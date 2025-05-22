@@ -47,8 +47,8 @@ export class UVProtectionCalculator {
   /**
    * Calculate the effective UV index based on environment
    */
-  static calculateEffectiveUV(actualUV: number, environment: number = 1): number {
-    const envFactor = ENVIRONMENTS[environment]?.reflectionFactor || 1.0;
+  static calculateEffectiveUV(actualUV: number, environment = 1): number {
+    const envFactor = ENVIRONMENTS[environment]?.reflectionFactor ?? 1.0;
     return actualUV * envFactor;
   }
 
@@ -58,7 +58,7 @@ export class UVProtectionCalculator {
   static calculateTimeToBurn(
     skinType: number,
     uvIndex: number,
-    spfValue: number = 1
+    spfValue = 1
   ): number {
     const skin = SKIN_TYPES[skinType];
     if (!skin || uvIndex <= 0) return Infinity;
@@ -89,18 +89,18 @@ export class UVProtectionCalculator {
     // Get effective UV considering environment
     const effectiveUV = this.calculateEffectiveUV(
       currentUV,
-      profile.environment || 1
+      profile.environment ?? 1
     );
 
     // Get max UV in the forecast period
     const maxForecastUV = Math.max(currentUV, ...forecastUV);
     const maxEffectiveUV = this.calculateEffectiveUV(
       maxForecastUV,
-      profile.environment || 1
+      profile.environment ?? 1
     );
 
     // Calculate time to burn with safe defaults
-    const spfValue = SPF_VALUES[profile.sunscreenUsage] || 1;
+    const spfValue = SPF_VALUES[profile.sunscreenUsage] ?? 1;
     const timeToBurn = this.calculateTimeToBurn(
       profile.skinType,
       maxEffectiveUV,
@@ -108,7 +108,7 @@ export class UVProtectionCalculator {
     );
 
     // Get planned time outdoors with safe default
-    const plannedMinutes = TIME_OUTDOORS[profile.timeOutdoors] || 90;
+    const plannedMinutes = TIME_OUTDOORS[profile.timeOutdoors] ?? 90;
 
     // Calculate protection score (0-100)
     let score = 0;
@@ -222,7 +222,13 @@ export class UVProtectionCalculator {
       { safe: 1, caution: 2, danger: 2 } // Type 5
     ];
 
-        const adjustment = adjustments[skinType] || adjustments[2]!;    return {      safe: Math.max(1, baseThresholds.safe + adjustment.safe),      caution: Math.max(2, baseThresholds.caution + adjustment.caution),      danger: Math.max(3, baseThresholds.danger + adjustment.danger)    };
+    const adjustment = adjustments[skinType] ?? adjustments[2]!;
+
+    return {
+      safe: Math.max(1, baseThresholds.safe + adjustment.safe),
+      caution: Math.max(2, baseThresholds.caution + adjustment.caution),
+      danger: Math.max(3, baseThresholds.danger + adjustment.danger)
+    };
   }
 
   /**
@@ -231,12 +237,12 @@ export class UVProtectionCalculator {
   static calculateVitaminDTime(
     skinType: number,
     uvIndex: number,
-    bodyExposure: number = 0.25 // Default 25% body exposure
+    bodyExposure = 0.25 // Default 25% body exposure
   ): number {
     // Approximate time in minutes to produce adequate vitamin D
     // Based on research for 1000 IU vitamin D production
     const skinTypeFactors = [0.5, 0.7, 1.0, 1.5, 2.0]; // Lighter skin produces vitamin D faster
-    const factor = skinTypeFactors[skinType] || 1.0;
+    const factor = skinTypeFactors[skinType] ?? 1.0;
     
     if (uvIndex < 3) {
       return Infinity; // Too low for significant vitamin D production
@@ -256,7 +262,7 @@ export const useUVProtection = (
   hourlyForecast: number[]
 ) => {
   const [protection, setProtection] = useState<ReturnType<typeof UVProtectionCalculator.calculateProtectionLevel> | null>(null);
-  const [vitaminDTime, setVitaminDTime] = useState<number>(0);
+  const [vitaminDTime, setVitaminDTime] = useState(0);
   const [thresholds, setThresholds] = useState<ReturnType<typeof UVProtectionCalculator.getUVThresholds> | null>(null);
 
   useEffect(() => {

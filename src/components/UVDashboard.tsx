@@ -1,14 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { getCurrentWeatherAndUV, getCurrentLocation } from '~/utils/weather';
-import {   useUVProtection,   UVProtectionCalculator,  UVNotificationScheduler,  SKIN_TYPES,   SPF_VALUES,   TIME_OUTDOORS,   ENVIRONMENTS,  type ProfileData} from '~/utils/uvProtection';
+import {   
+  useUVProtection,  
+  UVNotificationScheduler,  
+  SKIN_TYPES,   
+  type ProfileData
+} from '~/utils/uvProtection';
 
 interface WeatherData {
-  weather: any;
+  weather: {
+    name: string;
+    main: {
+      temp: number;
+    };
+    weather: Array<{
+      description: string;
+    }>;
+  };
   uv: { value: number };
 }
 
 export default function UVDashboard() {
-  const [location, setLocation] = useState<{ lat: number; lon: number } | null>(null);
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [showProfileSetup, setShowProfileSetup] = useState(false);
@@ -19,9 +31,9 @@ export default function UVDashboard() {
   const mockHourlyForecast = weatherData ? 
     Array.from({ length: 24 }, (_, i) => weatherData.uv.value + Math.sin(i * 0.3) * 2) : [];
 
-  const { protection, vitaminDTime, thresholds } = useUVProtection(
+  const { protection, vitaminDTime } = useUVProtection(
     profile, 
-    weatherData?.uv.value || 0, 
+    weatherData?.uv.value ?? 0, 
     mockHourlyForecast
   );
 
@@ -36,7 +48,6 @@ export default function UVDashboard() {
         
         // Get user location
         const userLocation = await getCurrentLocation();
-        setLocation(userLocation);
         
         // Get weather and UV data
         const data = await getCurrentWeatherAndUV(userLocation.lat, userLocation.lon);
@@ -45,7 +56,7 @@ export default function UVDashboard() {
         // Check for saved profile
         const savedProfile = localStorage.getItem('uvProfile');
         if (savedProfile) {
-          setProfile(JSON.parse(savedProfile));
+          setProfile(JSON.parse(savedProfile) as ProfileData);
         } else {
           setShowProfileSetup(true);
         }
@@ -56,13 +67,13 @@ export default function UVDashboard() {
       }
     };
 
-    loadData();
+    void loadData();
   }, []);
 
   // Schedule sunscreen reapplication reminders
   useEffect(() => {
     if (protection?.reapplyTime) {
-      UVNotificationScheduler.scheduleReapplicationReminder(protection.reapplyTime);
+      void UVNotificationScheduler.scheduleReapplicationReminder(protection.reapplyTime);
     }
   }, [protection]);
 
@@ -150,13 +161,13 @@ export default function UVDashboard() {
           
           <div className="text-center">
             <div className="text-sm opacity-75 mb-1">
-              {weatherData?.weather.name || 'Current Location'}
+              {weatherData?.weather.name ?? 'Current Location'}
             </div>
             <div className="text-3xl font-bold mb-2">
-              {Math.round(weatherData?.weather.main.temp || 0)}°C
+              {Math.round(weatherData?.weather.main.temp ?? 0)}°C
             </div>
             <div className="text-sm capitalize">
-              {weatherData?.weather.weather[0].description}
+              {weatherData?.weather.weather[0]?.description}
             </div>
           </div>
         </div>
@@ -165,8 +176,8 @@ export default function UVDashboard() {
         <div className="bg-white rounded-3xl shadow-xl p-6 mb-6">
           <div className="text-center">
             <h2 className="text-lg font-semibold text-gray-700 mb-2">UV Index</h2>
-            <div className={`text-6xl font-bold mb-2 ${getUVIndexColor(weatherData?.uv.value || 0)}`}>
-              {weatherData?.uv.value?.toFixed(1) || '0.0'}
+            <div className={`text-6xl font-bold mb-2 ${getUVIndexColor(weatherData?.uv.value ?? 0)}`}>
+              {weatherData?.uv.value?.toFixed(1) ?? '0.0'}
             </div>
             
             {protection && (
