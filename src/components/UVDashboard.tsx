@@ -7,18 +7,7 @@ import {
   type ProfileData
 } from '~/utils/uvProtection';
 
-interface WeatherData {
-  weather: {
-    name: string;
-    main: {
-      temp: number;
-    };
-    weather: Array<{
-      description: string;
-    }>;
-  };
-  uv: { value: number };
-}
+interface WeatherData {  weather: {    name: string;    main: {      temp: number;    };    weather: Array<{      description: string;    }>;    sys?: {      country: string;    };  };  uv: { value: number };}
 
 export default function UVDashboard() {
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
@@ -159,17 +148,7 @@ export default function UVDashboard() {
             </button>
           </div>
           
-          <div className="text-center">
-            <div className="text-sm opacity-75 mb-1">
-              {weatherData?.weather.name ?? 'Current Location'}
-            </div>
-            <div className="text-3xl font-bold mb-2">
-              {Math.round(weatherData?.weather.main.temp ?? 0)}°C
-            </div>
-            <div className="text-sm capitalize">
-              {weatherData?.weather.weather[0]?.description}
-            </div>
-          </div>
+                    <div className="text-center">            <div className="text-sm opacity-75 mb-1">              {weatherData?.weather.name ?                 `${weatherData.weather.name}${weatherData.weather.sys?.country ? `, ${weatherData.weather.sys.country}` : ''}` :                 'Current Location'              }            </div>            <div className="text-3xl font-bold mb-2">              {Math.round(weatherData?.weather.main.temp ?? 0)}°C            </div>            <div className="text-sm capitalize">              {weatherData?.weather.weather[0]?.description}            </div>          </div>
         </div>
 
         {/* UV Index Display */}
